@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This is for deploying EC2 with Secuirty Group
+Parameters:
+  Keyname:
+   Description: Enter the valid KeyName
+   Type: 'AWS::EC2::KeyPair::KeyName'
+   ConstraintDescription: must be the name of an existing EC2 KeyPair
+  Instancetype:
+    Description: Enter the valid Ec2 Instance ComplianceResourceTypes
+    Type: String
+    Default: t2.small
+    AllowedValues:
+      - t1.micro
+      - t2.micro
+      - t1.small
+      - t2.small
+  SecurityGroupName:
+     Description: Enter Security Group Name
+     Type: String
+  SecurityGroupDescription:
+     Description: Enter Security Group Description
+     Type: String
+  SecurityGroupPort:
+     Description: Enter Security Group Port Number
+     Type: Number
+     AllowedValues:
+       - 80
+       - 443
+  VPCID:
+      Description: Enter VPC ID
+      Type: 'AWS::EC2::VPC::Id'
+      ConstraintDescription: Must be valid VPC ID
+  Subnet:
+    Description: Enter subnet ID
+    Type: 'AWS::EC2::Subnet::Id'
+    ConstraintDescription: Must be valid Subnet ID
+
+Mappings:
+  AWSRegionami:
+    us-east-1:
+      HVM64: ami-14c5486b
+    us-east-2:
+      HVM64: ami-922914f7
+    us-west-1:
+      HVM64: ami-25110f45
+    us-west-2:
+      HVM64: ami-e251209a
+    eu-west-1:
+      HVM64: ami-ca0135b3
+    eu-west-2:
+      HVM64: ami-a36f8dc4
+
+Resources:
+  MyEC2Instance:
+      Type: "AWS::EC2::Instance"
+      Properties:
+        ImageId: !FindInMap [AWSRegionami, !Ref 'AWS::Region', HVM64]
+        KeyName: !Ref Keyname
+        InstanceType: !Ref Instancetype
+        SubnetId: !Ref Subnet
+        SecurityGroupIds:
+         - !Ref MySecurityGroup
+
+  MySecurityGroup:
+     Type: "AWS::EC2::SecurityGroup"
+     Properties:
+       GroupName: !Ref SecurityGroupName
+       GroupDescription: !Ref SecurityGroupDescription
+       SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: !Ref SecurityGroupPort
+            ToPort: !Ref SecurityGroupPort
+            CidrIp: 0.0.0.0/0
+       VpcId: !Ref VPCID
