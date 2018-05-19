@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This is for deploying EC2 with ELastic LoadBalancer
+Parameters:
+  SecurityGroupName:
+     Description: Enter Security Group Name
+     Type: String
+  SecurityGroupDescription:
+     Description: Enter Security Group Description
+     Type: String
+  SecurityGroupPort:
+     Description: Enter Security Group Port Number
+     Type: Number
+     AllowedValues:
+       - 80
+       - 443
+Resources:
+ MySecurityGroup:
+   Type: "AWS::EC2::SecurityGroup"
+   Properties:
+     GroupName: !Ref SecurityGroupName
+     GroupDescription: !Ref SecurityGroupDescription
+     SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref SecurityGroupPort
+          ToPort: !Ref SecurityGroupPort
+          CidrIp: 0.0.0.0/0
